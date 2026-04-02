@@ -50,6 +50,9 @@ filterwarnings = [
     "ignore:Pydantic serializer warnings:UserWarning:pydantic.*:",
 ]
 asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "requires_llm: test requires an LLM API key (skipped in CI without keys)",
+]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]

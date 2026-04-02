@@ -1,3 +1,4 @@
+import os
 from typing import Callable
 
 import pytest
@@ -6,6 +7,25 @@ from tau2.data_model.tasks import Task
 from tau2.environment.environment import Environment
 from tau2.registry import registry
 from tau2.run import get_tasks
+
+
+def _has_llm_api_key() -> bool:
+    """Check if any LLM API key is available."""
+    return bool(
+        os.environ.get("OPENAI_API_KEY")
+        or os.environ.get("ANTHROPIC_API_KEY")
+        or os.environ.get("AWS_ACCESS_KEY_ID")
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Auto-skip tests marked with requires_llm when no API key is set."""
+    if _has_llm_api_key():
+        return
+    skip_marker = pytest.mark.skip(reason="No LLM API key available")
+    for item in items:
+        if "requires_llm" in item.keywords:
+            item.add_marker(skip_marker)
 
 
 @pytest.fixture
