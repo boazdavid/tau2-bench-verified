@@ -5,6 +5,8 @@ import pytest
 from tau2.data_model.message import UserMessage
 from tau2.gym.gym_agent import UserGymEnv
 
+requires_llm = pytest.mark.requires_llm
+
 
 def test_user_gym_env_init():
     """Test that UserGymEnv can be initialized."""
@@ -18,6 +20,7 @@ def test_user_gym_env_init():
     assert env.agent_llm == "mock_llm"
 
 
+@requires_llm
 def test_user_gym_env_reset():
     """Test that UserGymEnv can be reset."""
     env = UserGymEnv(
@@ -39,6 +42,7 @@ def test_user_gym_env_reset():
     assert "policy" in info
 
 
+@requires_llm
 def test_user_gym_env_step():
     """Test that UserGymEnv can process a step."""
     env = UserGymEnv(
