@@ -429,7 +429,7 @@ class Results(BaseModel):
                 "task_id": sim.task_id,
                 "trial": sim.trial,
                 "seed": sim.seed,
-                "reward": sim.reward_info.reward,
+                "reward": sim.reward_info.reward if sim.reward_info else 0,
                 "agent_cost": sim.agent_cost,
                 "user_cost": sim.user_cost,
                 "termination_reason": sim.termination_reason,

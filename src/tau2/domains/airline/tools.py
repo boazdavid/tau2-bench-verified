@@ -1,6 +1,8 @@
 """Toolkit for the airline reservation system."""
 
 from copy import deepcopy
+import os
+from pathlib import Path
 from typing import List, Optional
 
 from loguru import logger
@@ -34,23 +36,30 @@ class AirlineTools(ToolKitBase):  # Tools
 
     db: FlightDB
 
-    def __init__(self, db: FlightDB) -> None:
+    def __init__(self, db: FlightDB, kb_dir: Optional[Path] = None) -> None:
         super().__init__(db)
 
+        if not kb_dir:
+            kb_dir = Path(os.getenv("KB_DIR"))
+            if kb_dir is None:
+                from pipeline.runtime.knowledge_tool import KnowledgeTool
+                self._kb = KnowledgeTool(kb_dir) if kb_dir else None
+
+ 
     def _get_user(self, user_id: str) -> User:
-        """Get user from database."""
+        """Retrieve a user object from the database by user ID."""
         if user_id not in self.db.users:
             raise ValueError(f"User {user_id} not found")
         return self.db.users[user_id]
 
     def _get_reservation(self, reservation_id: str) -> Reservation:
-        """Get reservation from database."""
+        """Retrieve a reservation object from the database by reservation ID."""
         if reservation_id not in self.db.reservations:
             raise ValueError(f"Reservation {reservation_id} not found")
         return self.db.reservations[reservation_id]
 
     def _get_flight(self, flight_number: str) -> Flight:
-        """Get flight from database."""
+        """Retrieve a flight object from the database by flight number."""
         if flight_number not in self.db.flights:
             raise ValueError(f"Flight {flight_number} not found")
         return self.db.flights[flight_number]
@@ -543,6 +552,43 @@ class AirlineTools(ToolKitBase):  # Tools
             A message indicating the user has been transferred to a human agent.
         """
         return "Transfer successful"
+
+    @is_tool(ToolType.READ)
+    def list_articles(self) -> str:
+        """
+        List the knowledge articles available. Returns a markdown table of every
+        article with its title, type, and description. Call this first to discover
+        which articles exist, then fetch the relevant ones with get_article.
+
+        Returns:
+            The contents of the knowledge article index.
+
+        Raises:
+            ValueError: If the knowledge base is not configured or the index is empty.
+        """
+        if self._kb is None:
+            raise ValueError("Knowledge base not configured")
+        return self._kb.list_articles()
+
+    @is_tool(ToolType.READ)
+    def get_article(self, article_slug: str) -> str:
+        """
+        Read a single knowledge article by its slug.
+
+        Args:
+            article_slug: The article's slug as shown in the index, e.g.
+                "cancelling-a-flight-reservation". A leading "concepts/" prefix
+                and a trailing ".md" suffix are both accepted and ignored.
+
+        Returns:
+            The text contents of the requested article.
+
+        Raises:
+            ValueError: If the knowledge base is not configured or the article does not exist.
+        """
+        if self._kb is None:
+            raise ValueError("Knowledge base not configured")
+        return self._kb.get_article(article_slug)
 
     @is_tool(ToolType.WRITE)
     def update_reservation_baggages(
