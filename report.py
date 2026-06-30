@@ -5,7 +5,15 @@ import argparse
 import csv
 import json
 import sys
+from math import comb
 from pathlib import Path
+
+
+def pass_hat_k(n: int, c: int, k: int) -> float:
+    """Compute pass^k metric (arxiv:2406.12045)."""
+    if n < k:
+        return 0.0
+    return comb(c, k) / comb(n, k)
 
 
 def process_file(filepath):
@@ -22,7 +30,6 @@ def process_file(filepath):
         return None
 
     passed = sum(1 for s in simulations if (s.get("reward_info") or {}).get("reward") == 1.0)
-    pass_rate = passed / n
 
     total_duration = 0
     total_cost = 0
@@ -59,7 +66,8 @@ def process_file(filepath):
         "file": filepath.name,
         "n": n,
         "passed": passed,
-        "pass^1": round(pass_rate, 4),
+        "pass^1": round(pass_hat_k(n, passed, 1), 4),
+        "pass^2": round(pass_hat_k(n, passed, 2), 4),
         "avg_duration": round(total_duration / n, 2),
         "avg_cost": round(total_cost / n, 6),
         "avg_prompt_tokens": round(total_prompt_tokens / n, 1),
@@ -96,7 +104,7 @@ def main():
             sys.exit(1)
 
     fieldnames = [
-        "file", "n", "passed", "pass^1",
+        "file", "n", "passed", "pass^1", "pass^2",
         "avg_duration", "avg_cost",
         "avg_prompt_tokens", "avg_completion_tokens", "avg_total_tokens",
         "avg_turns", "avg_knl_toolcalls", "avg_otoolcalls",
