@@ -1,5 +1,6 @@
 file,n,passed,pass^1,pass^2,avg_duration,avg_cost,avg_prompt_tokens,avg_completion_tokens,avg_total_tokens,avg_turns,avg_knl_toolcalls,avg_otoolcalls
 gpt-4o_test.json,40,21,0.525,0.2692,105.35,0.074083,48860.4,1289.5,50149.9,6.33,0.0,5.75
+gpt-4o_test_nopolicy.json,40,5,0.125,0.0128,72.04,0.062922,37779.9,1127.3,38907.3,5.92,0.0,7.45
 gpt-4o_test_wiki_t1.json,40,19,0.475,0.2192,124.23,0.126487,81519.7,1304.2,82823.9,6.08,2.08,7.38
 gpt-4o_test_wiki_t4.json,40,22,0.55,0.2962,139.47,0.13989,91578.3,1217.5,92795.8,6.05,1.75,6.45
 gpt-4o_test_wiki_t4_nopolicy.json,40,21,0.525,0.2692,163.55,0.153162,85873.3,1262.1,87135.4,5.97,2.35,6.42
